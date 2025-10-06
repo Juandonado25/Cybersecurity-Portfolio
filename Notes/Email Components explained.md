@@ -1,3 +1,5 @@
+# Email Components explained
+
 ## Headers:
 Headers are lines of metadata attached to an email and contain many useful string of information for analysis and investigators.
 
