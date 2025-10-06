@@ -40,7 +40,6 @@ It typically contains the message that the sender wants to convey, including tex
 - **Social Media Icons:** Links brand's social platforms. Can redirect to phishing pages.
 
 ## Addresses:
-# ![[Drawing 2025-10-06 04.37.37.excalidraw]]
 - **Email Address:** A unique identifier in the format [local-part@domain.com](#). Attackers spoof or create look-alike addresses.
 - **Local Part:** The part before @ (Usually the user's mailbox name). Can be random or similar to trusted usernames to trick recipients.
 - **Domain name:** The part after @ (Points to the mail server). Attackers use typosqatted or malicious domains.
