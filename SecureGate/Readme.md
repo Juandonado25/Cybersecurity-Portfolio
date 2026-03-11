@@ -1,39 +1,61 @@
-Para la infraestructura de **Secure Gate** se eligió una infraestructura segmentada porque me permite controlar mejor el trafico de la red y tener mejor control de la seguridad.
+# Secure Gate - Infraestructura de Red y Seguridad
 
-Este laboratorio se desplegó en un entorno virtual usando Virtualbox.
+## Descripción del Proyecto
+**Secure Gate** es un laboratorio de ciberseguridad diseñado bajo una arquitectura segmentada para maximizar el control del tráfico y la seguridad de los activos. El entorno está desplegado de forma virtual utilizando VirtualBox. El objetivo central es alojar una API segura en un contenedor Docker, protegida por un firewall perimetral y monitoreada por un SIEM.
 
-Se usa Port Forwarding para poder usar la IP de WAN y redirigir el trafico web a DMZ y así poder acceder desde el exterior de la red a la API.
-## Componentes de la red
+---
 
+## Arquitectura de Red
+La red se divide en tres segmentos principales administrados por un firewall **pfSense 24.0**:
 <img width="729" height="485" alt="image" src="https://github.com/user-attachments/assets/eeb3e116-8e44-4149-888b-451c51fe11e8" />
+### 1. WAN (Interfaz Externa)
+* **Interfaz:** `em0`.
+* **Configuración:** IP dinámica vía DHCP.
+* **Función:** Conexión a internet y recepción de tráfico externo mediante Port Forwarding para dirigir peticiones web a la DMZ.
 
+### 2. DMZ - Zona Desmilitarizada (10.0.0.0/24)
+* **Interfaz:** `em1`.
+* **Servidor Principal:** `Webserver-Debian` (IP estática: `10.0.0.50`).
+* **Sistema Operativo:** Debian 13 (Trixie).
+* **Rol:** Aloja el motor Docker donde se despliega la API y el stack de Wazuh.
+* **Seguridad:** Aislamiento estricto; el tráfico desde la DMZ hacia la LAN está bloqueado.
 
----
-
- **Firewall:** Un firewall Pfsense que maneja 3 interfaces:
-- **WAN:** Interfaz Puenteada que permite el acceso a internet.
-- **DMZ:** Interfaz con red interna que contiene solo al servidor web.
-- **LAN:** Esta interfaz también es una red interna y su principal uso es para administrar el firewall desde una computadora administrador.
-
-**Usuario de pfsense:** admin
-**Contraseña:** securegate.fw.123
-
----
-
-**Web Server:** En este server se va a usar un contenedor Docker desplegar la API. En principio este endpoint no tiene acceso a internet porque la red WAN esta bloqueada por defecto por el firewall.
-
-**S.O:** Debian 13
-**hostname:** debian
-**Root Password:** securegate.server.321
-**user:** gatekeeper
-**User Password:** gatekeeper.pass.321
+### 3. LAN - Red Interna (172.16.0.0/24)
+* **Interfaz:** `em2`.
+* **Cliente Admin:** `Debian-Client` (IP estática: `172.16.0.10`).
+* **Función:** Estación de trabajo para la administración del pfSense vía navegador web.
 
 ---
 
-**Debian Client (Admin):** El proposito de este endpoint es administrar el Pfsense por medio de el navegador web.
+## Implementación de Seguridad y Monitoreo
 
-**S.O:** Debian 13
-**hostname:** debian-client
-**Root Password:** securegate.client.321
-**user:** gateadmin
-**User Password:** gateadmin.pass.321
+### SIEM: Wazuh (v4.14.3)
+Se ha implementado un stack de Wazuh sobre Docker para la recolección centralizada de eventos.
+* **Recolección de Logs:** El firewall pfSense envía logs de sistema, firewall y DNS mediante Syslog (UDP/514) al servidor en la DMZ (`10.0.0.50`).
+* **Configuraciones Críticas:**
+  * El puerto del Dashboard se cambió de 443 a **8443** para evitar conflictos de servicios.
+  * Se habilitó `<logall>` y `<logall_json>` en el `wazuh_manager.conf` para asegurar la recepción de los logs de pfSense.
+  * Se configuró el archivo `filebeat.yml` para habilitar el módulo de archivos (`archives: enabled: true`).
+
+### Reglas de Firewall Destacadas
+* **Acceso Externo:** Se permite tráfico HTTP (80) y HTTPS (443) desde cualquier origen hacia el servidor web (`10.0.0.50`).
+* **Administración SSH:** Permitida exclusivamente desde el cliente LAN (`172.16.0.10`) hacia el servidor web (`10.0.0.50`).
+* **Aislamiento:** Denegación explícita de todo tráfico desde WAN que no esté específicamente permitido.
+
+---
+
+## Credenciales del Laboratorio
+
+| Dispositivo | Usuario | Contraseña |
+| :--- | :--- | :--- |
+| **pfSense WebGUI/Shell** | `admin` | `securegate.fw.123` |
+| **Web Server (Debian)** | `gatekeeper` | `gatekeeper.pass.321` |
+| **Web Server (Root)** | `root` | `securegate.server.321` |
+| **Admin Client (Debian)** | `gateadmin` | `gateadmin.pass.321` |
+| **Admin Client (Root)** | `root` | `securegate.client.321` |
+| **Wazuh API/Dashboard** | `admin` / `wazuh-wui` | `Wazuh-Secret-2026!` |
+
+---
+
+## Estado del Proyecto y Notas
+* **Pendiente:** Actualizar la documentación con las mejoras recientes, Decoders, Reglas, Suricata, etc...
