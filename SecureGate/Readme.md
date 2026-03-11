@@ -5,7 +5,8 @@ Este laboratorio se desplegó en un entorno virtual usando Virtualbox.
 Se usa Port Forwarding para poder usar la IP de WAN y redirigir el trafico web a DMZ y así poder acceder desde el exterior de la red a la API.
 ## Componentes de la red
 
-![[Pasted image 20260127003918.png]]
+<img width="729" height="485" alt="image" src="https://github.com/user-attachments/assets/eeb3e116-8e44-4149-888b-451c51fe11e8" />
+
 
 ---
 
