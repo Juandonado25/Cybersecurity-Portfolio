@@ -5,20 +5,19 @@
 - **Platform:** Let's Defend
 - **Analyst:** Juan J. Donado A.
 - **Event ID:** 
-- **Type:**
-- **Date:**
+- **Type:** 
+- **Date:** 
 - **Rule Name**: 
 - **Severity:** 
 - **Level**: 
-- **Source Address:** 
-- **Destination Address:** 
-- **Destination Hostname:**
+- **IP Address:** 
+- **Hostname:** 
 
 ## 🚨 Alert Description
 
 What triggered SIEMs alert?
 
-# 🔎 Investigation Process
+## 🔎 Investigation Process
 
 Step by step, like a real SOC.
 1. Alert Validation
